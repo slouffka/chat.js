@@ -1,16 +1,20 @@
 <html>
 <head>
-<title>Socket.IO chat</title>
+<title>Chat.js example
+</title>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script>
 
 $(document).ready(function() {
   var socket = io.connect('http://boogiech.chat.jit.su');
-  var message = $('#message');
-  var username = $('#username');
-  var sendbtn = $('#sendbtn');
-
+  var identity = $('#identity');
+  var controls = $('#controls');
+  var username_in = $('#username_in');
+  var message_in = $('#message_in');
+  var chatwindow = $('#msgwindow');
+  var send_btn = $('#send_btn');
+  var login_btn = $('#login_btn');
 
   // incoming message
   socket.on('message', function(data) {
@@ -26,32 +30,40 @@ $(document).ready(function() {
   });
 
   // input listeners
-  sendbtn.click(function() {
-    sendMessage(message.val());
+  send_btn.click(function() {
+    sendMessage(message_in.val());
   });
 
-  loginbtn.click(function() {
-    sendIdentity(username.val());
+  login_btn.click(function() {
+    sendIdentity(username_in.val());
   });
 
-  message.keypress(function(event) {
+  message_in.keypress(function(event) {
     // ENTER pressed
     if (event.which == 13) {
-      sendMessage(message.val());
+      sendMessage(message_in.val());
+    }
+  });
+
+  username_in.keypress(function(event) {
+    // ENTER pressed
+    if (event.which == 13) {
+      sendIdentity(username_in.val());
     }
   });
 
   // send our name to server
   function sendIdentity(name) {
-    $('#loginbtn').attr('disabled', true);
-
+    login_btn.attr('disabled', true);
     socket.emit('set name', name);
   }
 
   // hide identity box and show chat controls
   function showControls() {
-    $('#identity').hide();
-    $('#controls').show();
+    identity.hide();
+    controls.show();
+    
+    message_in.focus();
   }
 
   // add message to chat window
@@ -63,24 +75,26 @@ $(document).ready(function() {
       msg = '<div>' + message.body + '</div>';
     }
     
-    $('#messages').append(msg);
-    $('#messages').scrollTop($('#messages')[0].scrollHeight);
+    chatwindow.append(msg);
+    chatwindow.scrollTop(chatwindow[0].scrollHeight);
   }
 
   // send message to server
   function sendMessage(message) {
-    $('#sendbtn').attr('disabled', true);
+    send_btn.attr('disabled', true);
     
     socket.emit('message', message);
     
-    $('#message').val('');
-    $('#sendbtn').removeAttr('disabled');
-    $('#message').focus();
+    message_in.val('');
+    send_btn.removeAttr('disabled');
+    message_in.focus();
   }
+
+  username_in.focus();
 });
 </script>
 <style>
-  #messages {
+  #msgwindow {
     height: 300px;
     width: 600;
     border: 1px dashed;
@@ -124,16 +138,18 @@ $(document).ready(function() {
 </style>
 </head>
 <body>
-  <div id="messages"></div>
+  <div id="chatwindow">
+  </div>
   <div id="controls" style="display: none;">
-    <input id="message" type="text" name="message" />
-    <input id="sendbtn" type="button" name="send" value="Say!" />
+    <input id="message_in" type="text" name="message" />
+    <input id="send_btn" type="button" name="send" value="Say!" />
   </div>
   <div id="identity">
     <label for="username">Enter your name:</label>
-    <input id="username" type="text" name="username" />
-    <input id="loginbtn" type="button" name="login" value="Enter" />
+    <input id="username_in" type="text" name="username" />
+    <input id="login_btn" type="button" name="login" value="Enter" />
   </div>
-  <div id="users"></div>
+  <div id="users">
+  </div>
 </body>
 </html>
