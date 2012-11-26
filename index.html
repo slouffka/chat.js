@@ -7,128 +7,133 @@
 
 $(document).ready(function() {
   var socket = io.connect('http://boogiech.chat.jit.su');
+  var message = $('#message');
+  var username = $('#username');
+  var sendbtn = $('#sendbtn');
+
 
   // incoming message
   socket.on('message', function(data) {
-  	// console.log(data);
+    // console.log(data);
     showMessage(data);
   });
 
   // logged in
   socket.on('status', function(data) {
-  	if (data.status == 'ready') {
-  		showControls();
-  	}
+    if (data.status == 'ready') {
+      showControls();
+    }
   });
 
   // input listeners
-  $('#sendbtn').click(function() {
-  	sendMessage($('#message').val());
+  sendbtn.click(function() {
+    sendMessage(message.val());
   });
 
-  $('#loginbtn').click(function() {
-  	sendIdentity($('#username').val());
+  loginbtn.click(function() {
+    sendIdentity(username.val());
   });
 
-  $('#message').keypress(function(event) {
-  	if (event.which == 13) {
-  	  sendMessage($('#message').val());
-  	}
+  message.keypress(function(event) {
+    // ENTER pressed
+    if (event.which == 13) {
+      sendMessage(message.val());
+    }
   });
 
   // send our name to server
   function sendIdentity(name) {
-	$('#loginbtn').attr('disabled', true);
+    $('#loginbtn').attr('disabled', true);
 
-  	socket.emit('set name', name);
+    socket.emit('set name', name);
   }
 
   // hide identity box and show chat controls
   function showControls() {
-  	$('#identity').hide();
-  	$('#controls').show();
+    $('#identity').hide();
+    $('#controls').show();
   }
 
   // add message to chat window
   function showMessage(message) {
-  	var msg = '';
-  	if (message.name != undefined) {
-  	  msg = '<div><strong>' + message.name + '</strong>: ' + message.body + '</div>';
-  	} else {
-  	  msg = '<div>' + message.body + '</div>';
-  	}
-  	
-  	$('#messages').append(msg);
-	$('#messages').scrollTop($('#messages')[0].scrollHeight);
+    var msg = '';
+    if (message.name != undefined) {
+      msg = '<div><strong>' + message.name + '</strong>: ' + message.body + '</div>';
+    } else {
+      msg = '<div>' + message.body + '</div>';
+    }
+    
+    $('#messages').append(msg);
+    $('#messages').scrollTop($('#messages')[0].scrollHeight);
   }
 
   // send message to server
   function sendMessage(message) {
-  	$('#sendbtn').attr('disabled', true);
-  	
-  	socket.emit('message', message);
-  	
-  	$('#message').val('');
-  	$('#sendbtn').removeAttr('disabled');
-  	$('#message').focus();
+    $('#sendbtn').attr('disabled', true);
+    
+    socket.emit('message', message);
+    
+    $('#message').val('');
+    $('#sendbtn').removeAttr('disabled');
+    $('#message').focus();
   }
 });
 </script>
 <style>
-	#messages {
-		height: 300px;
-		width: 600;
-		border: 1px dashed;
-		padding: 10px;
-		overflow: auto;
-	}
+  #messages {
+    height: 300px;
+    width: 600;
+    border: 1px dashed;
+    padding: 10px;
+    overflow: auto;
+  }
 
-	#controls {
-		margin-top: 10px;
-	}
+  #controls {
+    margin-top: 10px;
+  }
 
-	#controls input[type="text"] {
-		width: 550px;
-		display: block;
-		border: 1px solid #999;
-		float: left;
-		padding: 10px;
-	}
+  #controls input[type="text"] {
+    width: 550px;
+    display: block;
+    border: 1px solid #999;
+    float: left;
+    padding: 10px;
+  }
 
-	#identity {
-		margin-top: 10px;
-	}
+  #identity {
+    margin-top: 10px;
+  }
 
-	#identity label {
-		float: left;
-		padding: 10px;
-		font-weight: bold;
-	}
+  #identity label {
+    float: left;
+    padding: 10px;
+    font-weight: bold;
+  }
 
-	#identity input[type="text"] {
-		width: 430px;
-		display: block;
-		border: 1px solid #999;
-		float: left;
-		padding: 10px;
-	}
+  #identity input[type="text"] {
+    width: 430px;
+    display: block;
+    border: 1px solid #999;
+    float: left;
+    padding: 10px;
+  }
 
-	input[type="button"] {
-		padding: 10px;
-	}
+  input[type="button"] {
+    padding: 10px;
+  }
 </style>
 </head>
 <body>
-	<div id="messages"></div>
-	<div id="controls" style="display: none;">
-		<input id="message" type="text" name="message" />
-		<input id="sendbtn" type="button" name="send" value="Say!" />
-	</div>
-	<div id="identity">
-		<label for="username">Enter your name:</label>
-		<input id="username" type="text" name="username" />
-		<input id="loginbtn" type="button" name="login" value="Enter" />
-	</div>
-	<div id="users"></div>
+  <div id="messages"></div>
+  <div id="controls" style="display: none;">
+    <input id="message" type="text" name="message" />
+    <input id="sendbtn" type="button" name="send" value="Say!" />
+  </div>
+  <div id="identity">
+    <label for="username">Enter your name:</label>
+    <input id="username" type="text" name="username" />
+    <input id="loginbtn" type="button" name="login" value="Enter" />
+  </div>
+  <div id="users"></div>
 </body>
 </html>

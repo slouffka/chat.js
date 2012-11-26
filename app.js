@@ -13,7 +13,7 @@ app.get('/', function (req, res) {
 io.sockets.on('connection', function (socket) {
   socket.broadcast.emit('user connected');
 
-  socket.emit('message', { body: 'You are connected to Boogiech Chat v0.01a' });
+  socket.emit('message', { body: 'You are now connected to Chat.js v0.01a' });
   
   socket.on('set name', function (name) {
   	socket.set('name', name, function () {
