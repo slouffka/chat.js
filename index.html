@@ -3,13 +3,14 @@
 <title>Chat.js example</title>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
+<script src="/config.js"></script>
 <script>
 
 var users = [];
 var name;
 
 $(document).ready(function () {
-  var socket = io.connect('http://178.49.44.100');
+  var socket = io.connect(config.hostname);
   var identity = $('#identity');
   var controls = $('#controls');
   var username_in = $('#username_in');
