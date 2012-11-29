@@ -1,13 +1,15 @@
 <html>
 <head>
-<title>Chat.js example
-</title>
+<title>Chat.js example</title>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script>
 
-$(document).ready(function() {
-  var socket = io.connect('http://boogiech.chat.jit.su');
+var users = [];
+var name;
+
+$(document).ready(function () {
+  var socket = io.connect('http://178.49.44.100');
   var identity = $('#identity');
   var controls = $('#controls');
   var username_in = $('#username_in');
@@ -16,46 +18,70 @@ $(document).ready(function() {
   var send_btn = $('#send_btn');
   var login_btn = $('#login_btn');
 
-  // incoming message
-  socket.on('message', function(data) {
-    // console.log(data);
-    showMessage(data);
-  });
+  // chat system messages
+  socket.on('system', function (data) {
+    console.log(data);
 
-  // logged in
-  socket.on('status', function(data) {
-    if (data.status == 'ready') {
-      showControls();
+    // we are conected to server (anonymous yet)
+    if (data.type == 'connected') {
+      showMessage(data);
     }
+
+    // we have set our name
+    if (data.type == 'name set') {
+      name = data.name;
+      showMessage(data);
+    }
+
+    // another user has joined
+    if (data.type == 'joined') {
+      showControls();
+      chatGetUsers();
+    }
+
+    // another user has joined
+    if (data.type == 'left') {
+      chatGetUsers();
+      showMessage(data);
+    }    
   });
 
   // input listeners
-  send_btn.click(function() {
-    sendMessage(message_in.val());
+  send_btn.click(function () {
+    chatSendMessage(message_in.val());
   });
 
-  login_btn.click(function() {
-    sendIdentity(username_in.val());
+  login_btn.click(function () {
+    chatSendName(username_in.val());
   });
 
-  message_in.keypress(function(event) {
-    // ENTER pressed
-    if (event.which == 13) {
-      sendMessage(message_in.val());
+  message_in.keypress(function (event) {
+    if (event.which == 13) {  // ENTER
+      chatSendMessage(message_in.val());
     }
   });
 
-  username_in.keypress(function(event) {
-    // ENTER pressed
-    if (event.which == 13) {
-      sendIdentity(username_in.val());
+  username_in.keypress(function (event) {
+    if (event.which == 13) {  // ENTER
+      chatSendName(username_in.val());
     }
   });
 
   // send our name to server
-  function sendIdentity(name) {
+  function chatSendName(name) {
     login_btn.attr('disabled', true);
     socket.emit('set name', name);
+  }
+
+  // send message to server
+  function chatSendMessage(message) {
+    send_btn.attr('disabled', true);
+    
+    socket.emit('message', message);
+    
+    message_in.val('');
+    send_btn.removeAttr('disabled');
+    message_in.focus();
   }
 
   // hide identity box and show chat controls
@@ -69,28 +95,16 @@ $(document).ready(function() {
   // add message to chat window
   function showMessage(message) {
     var msg = '';
-    if (message.name != undefined) {
-      msg = '<div><strong>' + message.name + '</strong>: ' + message.body + '</div>';
+    if (message.user != undefined) {
+      msg = '<div><strong>' + message.user + '</strong>: '
+          + message.body + '</div>';
     } else {
       msg = '<div>' + message.body + '</div>';
     }
     
     chatwindow.append(msg);
-    chatwindow.scrollTop(chatwindow[0].scrollHeight);
+    chatwindow.scrollTop(chatwindow.scrollHeight);
   }
-
-  // send message to server
-  function sendMessage(message) {
-    send_btn.attr('disabled', true);
-    
-    socket.emit('message', message);
-    
-    message_in.val('');
-    send_btn.removeAttr('disabled');
-    message_in.focus();
-  }
-
-  username_in.focus();
 });
 </script>
 <style>
@@ -149,7 +163,11 @@ $(document).ready(function() {
     <input id="username_in" type="text" name="username" />
     <input id="login_btn" type="button" name="login" value="Enter" />
   </div>
-  <div id="users">
+  <div id="userlist">
+    <div id="title">Users</div>
+    <div id="list">
+      users list
+    </div>
   </div>
 </body>
 </html>
