@@ -1,19 +1,15 @@
 {
   "name": "chat",
   "author": {
-    "name": "Vyacheslav Vortex",
+    "name": "Vyacheslav Moskalev",
     "email": "slouffka@gmail.com"
   },
-  "subdomain": "boogiech.chat",
   "scripts": {
-    "start": "app.js"
+    "start": "node app.js"
   },
   "version": "0.0.1-10",
   "dependencies": {
-    "express": "3.0.3",
-    "socket.io": "0.9.11"
-  },
-  "engines": {
-    "node": "0.8.x"
+    "express": "^3.0.3",
+    "socket.io": "^0.9.11"
   }
 }

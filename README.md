@@ -1,4 +1,4 @@
 Chat.js
 =======
 
-Using Express, Socket.io, Mongoose
+Simple web chat demo using Express & Socket.io.

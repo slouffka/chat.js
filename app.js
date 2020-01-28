@@ -5,11 +5,15 @@ var app = require('express')()
 var users = [];
 
 // start the server
-server.listen(80);
+server.listen(8080);
 
 // serving main page
 app.get('/', function (req, res) {
   res.sendfile(__dirname + '/index.html');
+});
+
+app.get('/js/config.js', function (req, res) {
+  res.sendfile(__dirname + '/js/config.js');
 });
 
 // serving user connection
